@@ -1,0 +1,89 @@
+function onStatusEdit(e) {
+  var sh = e.range.getSheet();
+  console.log(sh.getName());
+  if (sh.getName() == 'Registration' && e.value == "Registered") {
+    var email = sh.getRange(e.range.rowStart,2)
+    var pg = sh.getRange(e.range.rowStart,6)
+    console.log("Registered for: "+email.getValue()+""+pg.getValue());
+    var ss = null;
+   
+    if (pg.getValue().indexOf("Shoonya")!=-1){
+      ss = SpreadsheetApp.openByUrl("");
+      console.log("Shoonya sheet");
+      var data = ss.getSheetByName("WEST");
+      var columnToCheck = data.getRange("E:E").getValues();
+      var numRows = getLastRowSpecial(columnToCheck);
+      for (i = 2; i <= numRows; i++) {
+        email_range = data.getRange('I' + i);
+        program_range = data.getRange('E' + i);
+        if (email_range.getValue() === email.getValue() && program_range.getValue() === pg.getValue()) {
+          console.log("MATCHED");
+          email_range.offset(0, -8).setValue("REGISTERED");
+        }
+      }
+    }else if (pg.getValue().indexOf("Samyama")!=-1){
+      ss = SpreadsheetApp.openByUrl("");
+      console.log("Samyama sheet");
+      var data = ss.getSheetByName("WEST");
+      var columnToCheck = data.getRange("E:E").getValues();
+      var numRows = getLastRowSpecial(columnToCheck);
+      for (i = 2; i <= numRows; i++) {
+        email_range = data.getRange('J' + i);
+        program_range = data.getRange('E' + i);
+        if (email_range.getValue() === email.getValue() && program_range.getValue() === pg.getValue()) {
+          console.log("MATCHED");
+          email_range.offset(0, -9).setValue("REGISTERED");
+        }
+      }
+    }else if (pg.getValue().indexOf("Guru")!=-1){
+      ss = SpreadsheetApp.openByUrl("");
+      console.log("Samyama sheet");
+      var data = ss.getSheetByName("WEST");
+      var columnToCheck = data.getRange("E:E").getValues();
+      var numRows = getLastRowSpecial(columnToCheck);
+      for (i = 2; i <= numRows; i++) {
+        email_range = data.getRange('G' + i);
+        program_range = data.getRange('E' + i);
+        if (email_range.getValue() === email.getValue() && program_range.getValue() === pg.getValue()) {
+          console.log("MATCHED");
+          email_range.offset(0, -6).setValue("REGISTERED");
+        }
+      }
+    }else if (pg.getValue().indexOf("Bhava")!=-1){
+      ss = SpreadsheetApp.openByUrl("");
+      console.log("Shoonya sheet");
+      var data = ss.getSheetByName("WEST");
+      var columnToCheck = data.getRange("E:E").getValues();
+      var numRows = getLastRowSpecial(columnToCheck);
+      for (i = 2; i <= numRows; i++) {
+        email_range = data.getRange('I' + i);
+        program_range = data.getRange('E' + i);
+        if (email_range.getValue() === email.getValue() && program_range.getValue() === pg.getValue()) {
+          console.log("MATCHED");
+          email_range.offset(0, -8).setValue("REGISTERED");
+        }
+      }
+    }
+
+
+   
+  }
+}
+
+//utility
+function getLastRowSpecial(range){
+  var rowNum = 0;
+  var blank = false;
+  for(var row = 0; row < range.length; row++){
+ 
+    if(range[row][0] === "" && !blank){
+      rowNum = row;
+      blank = true;
+ 
+    }else if(range[row][0] !== ""){
+      blank = false;
+    };
+  };
+  return rowNum;
+};
+

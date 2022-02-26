@@ -1,0 +1,128 @@
+function Copy() {
+
+
+  var ss = SpreadsheetApp.getActive().getActiveSheet();
+  var ranges = ss.getActiveRangeList().getRanges()
+
+  // ---
+  var ts = SpreadsheetApp.getActive().getSheetByName('WEST');
+  var lastRow = ts.getLastRow();
+  // We might have multiple ranges, with each range having multiple rows, and some of the rows might be hidden/filtered.
+  // For each range we exclude hidden row and copy row by row.
+  // We collect all data in array copyData.
+  console.time("Copy");
+  var copyData = new Array();
+  var rows = 0;
+  for (var i = 0; i < ranges.length; i++) {
+    var r = ranges[i];
+    const topRow = r.getRow();
+    const endRow = topRow + r.getNumRows();
+    for (let row = topRow; row < endRow; row++) {
+      if (!ss.isRowHiddenByFilter(row)) {
+        rows = rows+1;
+        var data = ss.getRange(row, 1, 1, r.getNumColumns()).getValues();
+        copyData = copyData.concat(data);
+      }
+    }
+  }
+
+  //Write the data in ine go
+  ts.getRange(lastRow + 1, 3,rows, r.getNumColumns()).setValues(copyData);
+
+  console.timeEnd("Copy");
+  console.time("Sort");
+  ts.sort(3,false);
+  console.timeEnd("Sort")
+  console.time("Flush");
+  SpreadsheetApp.flush();
+  console.timeEnd("Flush")
+}
+
+
+function Transfer(){
+
+  const getColumns = (arr, indices) => arr.map(row => indices.map(i => row[i]));
+
+  var ss = SpreadsheetApp.getActive().getActiveSheet();
+  var ranges = ss.getActiveRangeList().getRanges()
+
+  var tr_spreadsheet = SpreadsheetApp.openById("");
+  var ts = tr_spreadsheet.getSheetByName('Registration');
+  var lastRow = ts.getLastRow();
+
+   // We might have multiple ranges, with each range having multiple rows, and some of the rows might be hidden/filtered.
+  // For each range we exclude hidden row and copy row by row.
+  console.time("Copy");
+  for (var i = 0; i < ranges.length; i++) {
+    var r = ranges[i];
+    const topRow = r.getRow();
+    const endRow = topRow + r.getNumRows();
+    for (let row = topRow; row < endRow; row++) {
+      if (!ss.isRowHiddenByFilter(row)) {
+        var data = ss.getRange(row,1,1,r.getNumColumns()).getValues();
+        var subset = getColumns(data, [7,8,15,19,4]);
+        var rows = new Array(1);
+        rows[0] = [];
+        rows[0].push(subset[0][0]);
+        rows[0].push(subset[0][1]);
+        rows[0].push(subset[0][2]);
+        rows[0].push(subset[0][3]);
+        rows[0].push("")
+        rows[0].push(subset[0][4]);
+        ts.getRange(lastRow + 1, 1, 1, 6).setValues(rows);
+        lastRow = lastRow + 1;
+        ss.getRange(row,1,1,r.getNumColumns()).getCell(1,1).setValue("Transfer to Registration Sheet");
+      }
+    }
+  }
+  /*var copyData = new Array();
+  var rows = 0;
+  for (var i = 0; i < ranges.length; i++) {
+    var r = ranges[i];
+    const topRow = r.getRow();
+    const endRow = topRow + r.getNumRows();
+    for (let row = topRow; row < endRow; row++) {
+      if (!ss.isRowHiddenByFilter(row)) {
+        var data = ss.getRange(row,1,1,r.getNumColumns()).getValues();
+        var subset = getColumns(data, [7,8,9,10,4]);
+        
+        var d = new Array(1);
+        d[rows] = [];
+        d[rows].push(subset[0][0]);
+        d[rows].push(subset[0][1]);
+        d[rows].push(subset[0][2]);
+        d[rows].push(subset[0][3]);
+        d[rows].push("")
+        d[rows].push(subset[0][4]);
+        copyData = copyData.concat(d);
+        ss.getRange(row,1,1,r.getNumColumns()).getCell(1,1).setValue("Transfer to Registration Sheet");
+        rows = rows+1;
+      }
+    }
+  }
+  ts.getRange(lastRow + 1, 1, rows, 6).setValues(copyData);*/
+  console.timeEnd("Copy");
+  SpreadsheetApp.flush();
+}
+
+
+function refreshAshramData() {
+  
+  //OPENS SPREADSHEET BY ID
+  var ms = SpreadsheetApp.openById('');
+  //GETS ACTIVE SPREADSHEET
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  //GETS SPECIFIC SHEET BY NAME WHERE DATA IS STORED
+  var poTab = ms.getSheetByName('Form Responses 1');
+  //STORES ALL DATA FROM SHEET
+  var poData = poTab.getDataRange().getValues();
+  //GETS SPECIFIC SHEET BY NAME WHERE DATA IS SENT
+  var transferTo = ss.getSheetByName('ASHRAM');
+  //CLEARS OLD DATA
+  transferTo.clearContents();
+  //UPDATES SHEET WITH NEW DATA
+  transferTo.getRange(1,1,poData.length,poData[0].length).setValues(poData);
+  transferTo.setFrozenRows(1)
+  transferTo.sort(1,false);
+  SpreadsheetApp.flush();
+}
